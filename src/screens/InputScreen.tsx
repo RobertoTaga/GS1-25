@@ -5,7 +5,7 @@ import { HeaderContainer, HeaderTitle } from '../components/Header';
 import theme from '../styles/theme';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { TextInput, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { saveEntry } from '../services/storage';
 
 type RootStackParamList = {
   Input: undefined;
@@ -29,19 +29,13 @@ const InputScreen: React.FC<InputScreenProps> = ({ navigation }) => {
       return;
     }
 
-    const newEntry = {
+    const entry = {
       humidity: humidityValue,
       slope: slopeValue,
       date: new Date().toISOString(),
     };
 
-    try {
-      const history = JSON.parse(await AsyncStorage.getItem('history') || '[]');
-      const updatedHistory = [newEntry, ...history];
-      await AsyncStorage.setItem('history', JSON.stringify(updatedHistory));
-    } catch (error) {
-      Alert.alert('Erro', 'Falha ao salvar os dados.');
-    }
+    await saveEntry(entry);
 
     navigation.navigate('Risk', { humidity: humidityValue, slope: slopeValue });
   };
@@ -75,13 +69,13 @@ const InputScreen: React.FC<InputScreenProps> = ({ navigation }) => {
             name: 'search',
             type: 'font-awesome',
             size: 20,
-            color: 'white'
+            color: 'white',
           }}
           buttonStyle={{
             backgroundColor: theme.colors.primary,
             borderRadius: 8,
             padding: 12,
-            marginTop: 24
+            marginTop: 24,
           }}
           onPress={handleSubmit}
         />

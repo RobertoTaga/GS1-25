@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/native';
 import { FlatList } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { loadHistory } from '../services/storage';
 import { HeaderContainer, HeaderTitle } from '../components/Header';
 import theme from '../styles/theme';
+import { calculateRisk } from '../services/riskCalculator';
 
 interface HistoryEntry {
   humidity: number;
@@ -15,25 +16,12 @@ const HistoryScreen: React.FC = () => {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
 
   useEffect(() => {
-    const loadHistory = async () => {
-      try {
-        const data = await AsyncStorage.getItem('history');
-        if (data) {
-          setHistory(JSON.parse(data));
-        }
-      } catch (error) {
-        console.log('Erro ao carregar histórico:', error);
-      }
+    const fetchHistory = async () => {
+      const data = await loadHistory();
+      setHistory(data);
     };
-
-    loadHistory();
+    fetchHistory();
   }, []);
-
-  const calculateRisk = (humidity: number, slope: number): string => {
-    if (humidity > 85 || slope > 45) return 'Alto';
-    if (humidity > 70 || slope > 30) return 'Médio';
-    return 'Baixo';
-  };
 
   return (
     <Container>

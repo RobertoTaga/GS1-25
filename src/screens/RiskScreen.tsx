@@ -6,6 +6,7 @@ import RiskIndicator from '../components/RiskIndicator';
 import theme from '../styles/theme';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
+import { calculateRisk } from '../services/riskCalculator';
 
 type RootStackParamList = {
   Risk: { humidity: number; slope: number };
@@ -23,10 +24,7 @@ type Props = {
 const RiskScreen: React.FC<Props> = ({ navigation, route }) => {
   const { humidity, slope } = route.params;
 
-  // Cálculo de risco baseado em regras simples
-  let riskLevel = 'Baixo';
-  if (humidity > 70 || slope > 30) riskLevel = 'Médio';
-  if (humidity > 85 || slope > 45) riskLevel = 'Alto';
+  const riskLevel = calculateRisk(humidity, slope);
 
   return (
     <Container>
